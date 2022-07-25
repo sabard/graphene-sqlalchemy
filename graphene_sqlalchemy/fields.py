@@ -15,7 +15,7 @@ from .batching import get_batch_resolver
 from .utils import EnumValue, get_query
 
 
-class UnsortedSQLAlchemyConnectionField(ConnectionField):
+class SQLAlchemyConnectionFieldBase(ConnectionField):
     @property
     def type(self):
         from .types import SQLAlchemyObjectType
@@ -91,8 +91,7 @@ class UnsortedSQLAlchemyConnectionField(ConnectionField):
         )
 
 
-# TODO Rename this to SortableSQLAlchemyConnectionField
-class SQLAlchemyConnectionField(UnsortedSQLAlchemyConnectionField):
+class SQLAlchemyConnectionField(SQLAlchemyConnectionFieldBase):
     def __init__(self, type_, *args, **kwargs):
         nullable_type = get_nullable_type(type_)
         if "sort" not in kwargs and issubclass(nullable_type, Connection):
@@ -108,6 +107,22 @@ class SQLAlchemyConnectionField(UnsortedSQLAlchemyConnectionField):
                 )
         elif "sort" in kwargs and kwargs["sort"] is None:
             del kwargs["sort"]
+
+        # if "filters" not in kwargs and issubclass(nullable_type, Connection):
+        #     # Let super class raise if type is not a Connection
+        #     try:
+        #         print(type(nullable_type.Edge.node._type))
+        #         kwargs.setdefault("filters", nullable_type.Edge.node._type.filters_argument())
+        #     except (AttributeError, TypeError):
+        #         raise TypeError(
+        #             'Cannot create filters argument for {}. A model is required. Set the "filters" argument'
+        #             " to None to disabling the creation of the filters query argument".format(
+        #                 nullable_type.__name__
+        #             )
+        #         )
+        # elif "filters" in kwargs and kwargs["filters"] is None:
+        #     del kwargs["filters"]
+
         super(SQLAlchemyConnectionField, self).__init__(type_, *args, **kwargs)
 
     @classmethod
@@ -130,7 +145,7 @@ class SQLAlchemyConnectionField(UnsortedSQLAlchemyConnectionField):
         return query
 
 
-class BatchSQLAlchemyConnectionField(UnsortedSQLAlchemyConnectionField):
+class BatchSQLAlchemyConnectionField(SQLAlchemyConnectionFieldBase):
     """
     This is currently experimental.
     The API and behavior may change in future versions.
@@ -159,7 +174,7 @@ def default_connection_field_factory(relationship, registry, **field_kwargs):
 
 
 # TODO Remove in next major version
-__connectionFactory = UnsortedSQLAlchemyConnectionField
+__connectionFactory = SQLAlchemyConnectionFieldBase
 
 
 def createConnectionField(type_, **field_kwargs):
@@ -188,7 +203,7 @@ def unregisterConnectionFieldFactory():
         DeprecationWarning,
     )
     global __connectionFactory
-    __connectionFactory = UnsortedSQLAlchemyConnectionField
+    __connectionFactory = SQLAlchemyConnectionFieldBase
 
 
 def get_nullable_type(_type):

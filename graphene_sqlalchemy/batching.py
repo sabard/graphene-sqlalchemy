@@ -70,6 +70,7 @@ def get_batch_resolver(relationship_prop):
                     child_mapper
                 )
             else:
+                # TODO add sort method to test
                 selectin_loader._load_for_path(
                     query_context,
                     parent_mapper._path_registry,

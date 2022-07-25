@@ -5,7 +5,7 @@ from graphene import NonNull, ObjectType
 from graphene.relay import Connection, Node
 
 from ..fields import (SQLAlchemyConnectionField,
-                      UnsortedSQLAlchemyConnectionField)
+                      SQLAlchemyConnectionFieldBase)
 from ..types import SQLAlchemyObjectType
 from .models import Editor as EditorModel
 from .models import Pet as PetModel
@@ -44,7 +44,7 @@ def test_promise_connection_resolver():
     def resolver(_obj, _info):
         return Promise.resolve([])
 
-    result = UnsortedSQLAlchemyConnectionField.connection_resolver(
+    result = SQLAlchemyConnectionFieldBase.connection_resolver(
         resolver, Pet.connection, Pet, None, None
     )
     assert isinstance(result, Promise)
@@ -60,7 +60,7 @@ def test_type_assert_object_has_connection():
         SQLAlchemyConnectionField(Editor).type
 
 ##
-# UnsortedSQLAlchemyConnectionField
+# SQLAlchemyConnectionFieldBase
 ##
 
 

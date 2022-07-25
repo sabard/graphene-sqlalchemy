@@ -16,7 +16,7 @@ from graphene.types.json import JSONString
 from ..converter import (convert_sqlalchemy_column,
                          convert_sqlalchemy_composite,
                          convert_sqlalchemy_relationship)
-from ..fields import (UnsortedSQLAlchemyConnectionField,
+from ..fields import (SQLAlchemyConnectionFieldBase,
                       default_connection_field_factory)
 from ..registry import Registry, get_global_registry
 from ..types import SQLAlchemyObjectType
@@ -227,7 +227,7 @@ def test_should_manytomany_convert_connectionorlist_connection():
         Reporter.pets.property, A, default_connection_field_factory, True, 'orm_field_name',
     )
     assert isinstance(dynamic_field, graphene.Dynamic)
-    assert isinstance(dynamic_field.get_type(), UnsortedSQLAlchemyConnectionField)
+    assert isinstance(dynamic_field.get_type(), SQLAlchemyConnectionFieldBase)
 
 
 def test_should_manytoone_convert_connectionorlist():

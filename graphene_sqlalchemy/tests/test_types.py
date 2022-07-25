@@ -8,7 +8,7 @@ from graphene.relay import Connection
 
 from ..converter import convert_sqlalchemy_composite
 from ..fields import (SQLAlchemyConnectionField,
-                      UnsortedSQLAlchemyConnectionField, createConnectionField,
+                      SQLAlchemyConnectionFieldBase, createConnectionField,
                       registerConnectionFieldFactory,
                       unregisterConnectionFieldFactory)
 from ..types import ORMField, SQLAlchemyObjectType, SQLAlchemyObjectTypeOptions
@@ -224,7 +224,7 @@ def test_sqlalchemy_override_fields():
 
     articles_field = ReporterType._meta.fields['articles']
     assert isinstance(articles_field, Dynamic)
-    assert isinstance(articles_field.type(), UnsortedSQLAlchemyConnectionField)
+    assert isinstance(articles_field.type(), SQLAlchemyConnectionFieldBase)
     assert articles_field.type().deprecation_reason == "Overridden"
 
     pets_field = ReporterType._meta.fields['pets']
@@ -431,7 +431,7 @@ def test_default_connection_field_factory():
             model = Article
             interfaces = (Node,)
 
-    assert isinstance(ReporterType._meta.fields['articles'].type(), UnsortedSQLAlchemyConnectionField)
+    assert isinstance(ReporterType._meta.fields['articles'].type(), SQLAlchemyConnectionFieldBase)
 
 
 def test_custom_connection_field_factory():
